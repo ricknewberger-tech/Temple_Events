@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#4a90a4">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Guide - Chavurah</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .guide-hero {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 48px 0 40px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+        .guide-hero h1 {
+            font-size: 2.2rem;
+            margin: 0 0 12px;
+            font-weight: 700;
+        }
+        .guide-hero p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin: 0;
+        }
+        .guide-section {
+            margin-bottom: 40px;
+        }
+        .guide-section-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+        .guide-section-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+        .icon-blue  { background: #e3f2f7; }
+        .icon-green { background: #e8f5e9; }
+        .icon-orange{ background: #fff3e0; }
+        .icon-purple{ background: #f3e5f5; }
+        .guide-section-header h2 {
+            font-size: 1.4rem;
+            margin: 0;
+            color: var(--text-color);
+        }
+        .guide-section-header p {
+            margin: 4px 0 0;
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+        .steps {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .step {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            background: var(--card-bg);
+            border: 1px solid rgba(0,0,0,0.06);
+            border-radius: 10px;
+            padding: 16px 18px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+        .step-num {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            font-weight: 700;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .step-content strong {
+            display: block;
+            color: var(--text-color);
+            margin-bottom: 3px;
+        }
+        .step-content p {
+            margin: 0;
+            color: var(--text-light);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        .tip-box {
+            background: #e3f2f7;
+            border-left: 4px solid var(--primary-color);
+            border-radius: 0 8px 8px 0;
+            padding: 14px 18px;
+            margin-top: 16px;
+            font-size: 0.95rem;
+            color: var(--text-color);
+        }
+        .tip-box strong { color: var(--primary-dark); }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+        }
+        .feature-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(0,0,0,0.06);
+            border-radius: 10px;
+            padding: 18px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+        .feature-card .feat-icon {
+            font-size: 1.6rem;
+            margin-bottom: 10px;
+        }
+        .feature-card strong {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-color);
+        }
+        .feature-card p {
+            margin: 0;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .divider {
+            border: none;
+            border-top: 1px solid var(--border-color);
+            margin: 8px 0 32px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            vertical-align: middle;
+        }
+        .badge-blue   { background: #e3f2f7; color: var(--primary-dark); }
+        .badge-green  { background: #e8f5e9; color: #2e7d32; }
+        .badge-orange { background: #fff3e0; color: #e65100; }
+        @media (max-width: 600px) {
+            .guide-hero h1 { font-size: 1.6rem; }
+            .guide-hero p  { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <a href="index.html" class="logo">Chavurah</a>
+            <nav>
+                <a href="index.html">Upcoming Events</a>
+                <a href="past-events.html">Past Events</a>
+                <a href="members.html">Members</a>
+                <a href="guide.html" class="active">Guide</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="guide-hero">
+        <div class="container">
+            <h1>Welcome to Vintage Menschen Chavurah 👋</h1>
+            <p>Everything you need to know to plan events and connect with members</p>
+        </div>
+    </div>
+
+    <main style="padding-top: 0;">
+        <div class="container">
+
+            <!-- Sign In -->
+            <div class="guide-section">
+                <div class="guide-section-header">
+                    <div class="guide-section-icon icon-blue">🔑</div>
+                    <div>
+                        <h2>Getting Started</h2>
+                        <p>Sign in with your member access code</p>
+                    </div>
+                </div>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-num">1</div>
+                        <div class="step-content">
+                            <strong>Enter your access code</strong>
+                            <p>On the home page, type in your personal 6-digit access code and tap <em>Sign In</em>.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-num">2</div>
+                        <div class="step-content">
+                            <strong>Stay signed in</strong>
+                            <p>Check "Remember me on this device" and you won't need to sign in again on the same phone or browser.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="divider">
+
+            <!-- RSVP -->
+            <div class="guide-section">
+                <div class="guide-section-header">
+                    <div class="guide-section-icon icon-green">📅</div>
+                    <div>
+                        <h2>Browsing &amp; RSVPing to Events</h2>
+                        <p>See what's coming up and save your spot</p>
+                    </div>
+                </div>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-num">1</div>
+                        <div class="step-content">
+                            <strong>Browse upcoming events</strong>
+                            <p>The home page shows all upcoming events. Tap any event card to see full details.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-num">2</div>
+                        <div class="step-content">
+                            <strong>RSVP or show interest</strong>
+                            <p><span class="badge badge-green">Upcoming</span> events have an RSVP button — tap it to reserve your spot. <span class="badge badge-orange">Interested</span> events are still being planned — tap to let the host know you're interested.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-num">3</div>
+                        <div class="step-content">
+                            <strong>Add to your calendar</strong>
+                            <p>After RSVPing, tap <em>Add to Calendar</em> to save the event to Google Calendar, Apple Calendar, or Outlook.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="divider">
+
+            <!-- Create an Event -->
+            <div class="guide-section">
+                <div class="guide-section-header">
+                    <div class="guide-section-icon icon-orange">✨</div>
+                    <div>
+                        <h2>Creating an Event</h2>
+                        <p>Any member can propose or host an event</p>
+                    </div>
+                </div>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-num">1</div>
+                        <div class="step-content">
+                            <strong>Tap "+ New Event"</strong>
+                            <p>You'll find this button at the top of the Upcoming Events page after signing in.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-num">2</div>
+                        <div class="step-content">
+                            <strong>Choose the event type</strong>
+                            <p><span class="badge badge-orange">Interested</span> — Post the idea first to gauge interest before committing to a date or location.<br>
+                            <span class="badge badge-green">Upcoming</span> — Everything is set and members can RSVP right away.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-num">3</div>
+                        <div class="step-content">
+                            <strong>Fill in the details</strong>
+                            <p>Add a date, time, location, description, and optionally a max attendee count. The more detail you provide, the more excited people will be!</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-num">4</div>
+                        <div class="step-content">
+                            <strong>Tap "Create Event"</strong>
+                            <p>Your event appears on the home page immediately. Everyone in the club can see it and respond.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="tip-box">
+                    <strong>Tip:</strong> Start with an <em>Interested</em> event to see who's in before locking in a venue — then upgrade it to <em>Upcoming</em> once the details are set.
+                </div>
+            </div>
+
+            <hr class="divider">
+
+            <!-- Communicating -->
+            <div class="guide-section">
+                <div class="guide-section-header">
+                    <div class="guide-section-icon icon-purple">💬</div>
+                    <div>
+                        <h2>Communicating About Your Event</h2>
+                        <p>Keep attendees informed and the conversation going</p>
+                    </div>
+                </div>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feat-icon">📢</div>
+                        <strong>Post an Update</strong>
+                        <p>As the event host, tap <em>Post Update</em> on the event page to share news — changed location, what to bring, parking tips, anything.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feat-icon">💬</div>
+                        <strong>Discussion Tab</strong>
+                        <p>Any member can ask questions or chat in the Discussion section of each event. Great for coordinating carpools or sharing excitement!</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feat-icon">📧</div>
+                        <strong>Email All Attendees</strong>
+                        <p>Tap <em>Email Attendees</em> on the event page to open a pre-addressed email to everyone who has RSVPed — no copy-paste required.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feat-icon">👥</div>
+                        <strong>See Who's Coming</strong>
+                        <p>The event page lists all RSVPs so you know exactly who to expect. Attendees can see each other too.</p>
+                    </div>
+                </div>
+                <div class="tip-box">
+                    <strong>Tip:</strong> Post an update a day before your event as a friendly reminder — attendance goes up!
+                </div>
+            </div>
+
+            <hr class="divider">
+
+            <!-- Quick Reference -->
+            <div class="guide-section">
+                <div class="guide-section-header">
+                    <div class="guide-section-icon icon-blue">⚡</div>
+                    <div>
+                        <h2>Quick Reference</h2>
+                        <p>Everything at a glance</p>
+                    </div>
+                </div>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feat-icon">🏠</div>
+                        <strong>Home Page</strong>
+                        <p>All upcoming events, RSVP buttons, and the "+ New Event" button.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feat-icon">🕑</div>
+                        <strong>Past Events</strong>
+                        <p>Browse the archive of previous gatherings.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feat-icon">👤</div>
+                        <strong>Members</strong>
+                        <p>See the full member directory.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feat-icon">📱</div>
+                        <strong>Works on Mobile</strong>
+                        <p>Add the site to your home screen for quick access — it works like an app!</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p class="text-center text-muted">&copy; 2026 Vintage Menschen Chavurah</p>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#4a90a4">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Chavurah</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <a href="index.html" class="logo">Chavurah</a>
+            <nav>
+                <a href="index.html">Upcoming Events</a>
+                <a href="past-events.html">Past Events</a>
+                <a href="members.html">Members</a>
+                <a href="guide.html">Guide</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Notification Banner -->
+    <div id="notification-banner-container"></div>
+
+    <main>
+        <div class="container">
+            <!-- Login Form -->
+            <div id="login-section" class="login-container">
+                <div class="card login-card">
+                    <h1>Admin Login</h1>
+                    <form id="login-form">
+                        <div class="form-group">
+                            <label for="admin-first-name">First Name</label>
+                            <input type="text" id="admin-first-name" required placeholder="Enter your first name">
+                        </div>
+                        <div class="form-group">
+                            <label for="admin-last-name">Last Name</label>
+                            <input type="text" id="admin-last-name" required placeholder="Enter your last name">
+                        </div>
+                        <div class="form-group">
+                            <label for="admin-code">Admin Code</label>
+                            <input type="password" id="admin-code" required placeholder="Enter admin code" maxlength="4" inputmode="numeric" pattern="[0-9]*">
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+                    </form>
+                    <p id="login-error" class="text-muted mt-2" style="color: var(--error-color); display: none;">
+                        Invalid credentials
+                    </p>
+                </div>
+            </div>
+
+            <!-- Admin Panel (hidden until logged in) -->
+            <div id="admin-panel" style="display: none;">
+                <div class="flex-between mb-3">
+                    <div>
+                        <h1 class="page-title">Admin Panel</h1>
+                        <p class="page-subtitle">Manage events and RSVPs</p>
+                    </div>
+                    <button id="btn-logout" class="btn btn-secondary">Logout</button>
+                </div>
+
+                <!-- Tabs -->
+                <div class="flex gap-2 mb-3">
+                    <button class="btn btn-primary tab-btn active" data-tab="events">Events</button>
+                    <button class="btn btn-secondary tab-btn" data-tab="rsvps">All RSVPs</button>
+                    <button class="btn btn-secondary tab-btn" data-tab="notifications">Notifications</button>
+                    <button class="btn btn-secondary tab-btn" data-tab="maintenance">Maintenance</button>
+                    <!-- SMS temporarily disabled - uncomment to re-enable
+                    <button class="btn btn-secondary tab-btn" data-tab="sms">Send SMS</button>
+                    -->
+                </div>
+
+                <!-- Events Tab -->
+                <div id="tab-events" class="tab-content">
+                    <div class="flex-between mb-2">
+                        <h2>All Events</h2>
+                        <button id="btn-new-event" class="btn btn-success">+ New Event</button>
+                    </div>
+                    <div id="admin-events-list">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <p>Loading events...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RSVPs Tab -->
+                <div id="tab-rsvps" class="tab-content" style="display: none;">
+                    <h2 class="mb-2">All RSVPs</h2>
+                    <div id="admin-rsvps-list">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <p>Loading RSVPs...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notifications Tab -->
+                <div id="tab-notifications" class="tab-content" style="display: none;">
+                    <div class="flex-between mb-2">
+                        <h2>Notifications</h2>
+                        <button id="btn-new-notification" class="btn btn-success">+ New Notification</button>
+                    </div>
+                    <div id="admin-notifications-list">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <p>Loading notifications...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Maintenance Tab -->
+                <div id="tab-maintenance" class="tab-content" style="display: none;">
+                    <h2 class="mb-2">Maintenance</h2>
+                    <div class="card">
+                        <h3>Delete Past Event RSVPs</h3>
+                        <p class="text-muted mt-1">Permanently removes all RSVPs linked to events that have already taken place. Attendance counts on the Past Events page are stored in the <strong>RSVPCount</strong> field on each event record and will not be affected.</p>
+                        <div id="maintenance-rsvp-status" class="mt-2 text-muted">Loading...</div>
+                        <div class="mt-2">
+                            <button id="btn-delete-past-rsvps" class="btn btn-danger" disabled>Delete Past Event RSVPs</button>
+                        </div>
+                    </div>
+                    <div class="card mt-3">
+                        <h3>Remove Duplicate RSVPs</h3>
+                        <p class="text-muted mt-1">Finds cases where the same member has more than one RSVP for the same event. Keeps the most recent record and deletes the extras.</p>
+                        <div id="deduplicate-rsvp-status" class="mt-2 text-muted">Loading...</div>
+                        <div class="mt-2">
+                            <button id="btn-deduplicate-rsvps" class="btn btn-danger" disabled>Remove Duplicate RSVPs</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SMS Tab -->
+                <div id="tab-sms" class="tab-content" style="display: none;">
+                    <h2 class="mb-2">Send SMS to Members</h2>
+                    <div class="card">
+                        <form id="sms-form">
+                            <div class="form-group">
+                                <label>Select Recipients *</label>
+                                <div class="sms-recipient-options">
+                                    <label class="radio-label">
+                                        <input type="radio" name="sms-recipients" value="all" checked>
+                                        <span>All members with SMS opt-in</span>
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="sms-recipients" value="event">
+                                        <span>Event attendees (select event below)</span>
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="sms-recipients" value="custom">
+                                        <span>Select specific members</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div id="sms-event-selector" class="form-group" style="display: none;">
+                                <label for="sms-event">Select Event</label>
+                                <select id="sms-event">
+                                    <option value="">Choose an event...</option>
+                                </select>
+                            </div>
+
+                            <div id="sms-member-selector" style="display: none;">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="sms-select-all">
+                                    <span>Select All</span>
+                                </label>
+                                <div id="sms-member-list" class="member-checkbox-list">
+                                    <!-- Populated dynamically -->
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="sms-message">Message * <span id="sms-char-count">0/160 characters</span></label>
+                                <textarea id="sms-message" rows="4" maxlength="320" required placeholder="Keep it brief - SMS has character limits"></textarea>
+                                <p class="text-muted">Tip: Messages over 160 characters are sent as multiple SMS and cost more.</p>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="sms-preview">Preview</label>
+                                <div id="sms-preview" class="sms-preview-box">
+                                    <p class="text-muted">Message preview will appear here...</p>
+                                </div>
+                            </div>
+
+                            <div class="flex-between">
+                                <p id="sms-recipient-count" class="text-muted">0 recipients selected</p>
+                                <button type="submit" id="btn-send-sms" class="btn btn-primary" disabled>
+                                    Send SMS
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="mt-3">
+                        <h3>Recent SMS Logs</h3>
+                        <div id="sms-logs-list">
+                            <div class="loading">
+                                <div class="spinner"></div>
+                                <p>Loading logs...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Event Modal -->
+    <div id="event-modal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="event-modal-title">New Event</h2>
+                <button class="modal-close" id="event-modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="event-form">
+                    <input type="hidden" id="event-id">
+
+                    <div class="form-group">
+                        <label for="event-name">Event Name *</label>
+                        <input type="text" id="event-name" required placeholder="e.g., Summer BBQ">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="event-date">Date *</label>
+                            <input type="date" id="event-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="event-time">Time</label>
+                            <select id="event-time">
+                                <option value="">Select...</option>
+                                <option value="06:00">6:00 AM</option>
+                                <option value="06:30">6:30 AM</option>
+                                <option value="07:00">7:00 AM</option>
+                                <option value="07:30">7:30 AM</option>
+                                <option value="08:00">8:00 AM</option>
+                                <option value="08:30">8:30 AM</option>
+                                <option value="09:00">9:00 AM</option>
+                                <option value="09:30">9:30 AM</option>
+                                <option value="10:00">10:00 AM</option>
+                                <option value="10:30">10:30 AM</option>
+                                <option value="11:00">11:00 AM</option>
+                                <option value="11:30">11:30 AM</option>
+                                <option value="12:00">12:00 PM</option>
+                                <option value="12:30">12:30 PM</option>
+                                <option value="13:00">1:00 PM</option>
+                                <option value="13:30">1:30 PM</option>
+                                <option value="14:00">2:00 PM</option>
+                                <option value="14:30">2:30 PM</option>
+                                <option value="15:00">3:00 PM</option>
+                                <option value="15:30">3:30 PM</option>
+                                <option value="16:00">4:00 PM</option>
+                                <option value="16:30">4:30 PM</option>
+                                <option value="17:00">5:00 PM</option>
+                                <option value="17:30">5:30 PM</option>
+                                <option value="18:00">6:00 PM</option>
+                                <option value="18:30">6:30 PM</option>
+                                <option value="19:00">7:00 PM</option>
+                                <option value="19:30">7:30 PM</option>
+                                <option value="20:00">8:00 PM</option>
+                                <option value="20:30">8:30 PM</option>
+                                <option value="21:00">9:00 PM</option>
+                                <option value="21:30">9:30 PM</option>
+                                <option value="22:00">10:00 PM</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="event-max">Max Attendees</label>
+                            <input type="number" id="event-max" min="1" placeholder="Unlimited">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="event-location-type">Location Type</label>
+                        <select id="event-location-type">
+                            <option value="">Select...</option>
+                            <option value="Restaurant">Restaurant</option>
+                            <option value="Member's Home">Member's Home</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="member-host-group" style="display: none;">
+                        <label for="event-member-host">Host Member</label>
+                        <select id="event-member-host">
+                            <option value="">Select a member...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="event-custom-location">Custom Location</label>
+                        <textarea id="event-custom-location" rows="2" placeholder="e.g., John's House, The Blue Cafe"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="event-address">Address</label>
+                        <textarea id="event-address" rows="2" placeholder="Full address"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="event-status">Status</label>
+                        <select id="event-status">
+                            <option value="Upcoming">Upcoming</option>
+                            <option value="Interested">Interested</option>
+                            <option value="Canceled">Canceled</option>
+                            <option value="Completed">Completed</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="event-description">Description</label>
+                        <textarea id="event-description" placeholder="Event details, what to bring, etc."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" id="event-modal-cancel-event" style="display: none; margin-right: auto;">Cancel Event</button>
+                <button type="button" class="btn btn-secondary" id="event-modal-cancel">Close</button>
+                <button type="submit" form="event-form" class="btn btn-primary" id="event-modal-save">Save Event</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cancel Event Confirmation Modal -->
+    <div id="cancel-modal" class="modal-overlay">
+        <div class="modal" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2>Cancel Event</h2>
+                <button class="modal-close" id="cancel-modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Mark this event as canceled? It will still appear on the events page with a "Canceled" tag.</p>
+                <div class="form-group mt-2">
+                    <label for="cancel-reason">Reason (optional)</label>
+                    <input type="text" id="cancel-reason" placeholder="e.g., Host is ill, Weather conditions">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="cancel-modal-dismiss">Go Back</button>
+                <button type="button" class="btn btn-danger" id="cancel-modal-confirm">Cancel Event</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Event Confirmation Modal -->
+    <div id="delete-modal" class="modal-overlay">
+        <div class="modal" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2>Delete Event</h2>
+                <button class="modal-close" id="delete-modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to <strong>permanently delete</strong> this event? This cannot be undone.</p>
+                <p class="text-muted mt-1">If you want to keep the event visible but marked as canceled, use "Cancel Event" in the edit form instead.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="delete-modal-dismiss">Go Back</button>
+                <button type="button" class="btn btn-danger" id="delete-modal-confirm">Delete Event</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Attendees Modal -->
+    <div id="attendees-modal" class="modal-overlay">
+        <div class="modal" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2 id="attendees-modal-title">Add Attendees</h2>
+                <button class="modal-close" id="attendees-modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted mb-2">Select members to add as attendees:</p>
+                <div id="attendees-member-list"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="attendees-modal-cancel">Cancel</button>
+                <button type="button" class="btn btn-primary" id="attendees-modal-save">Add Selected</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Modal -->
+    <div id="notification-modal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="notification-modal-title">New Notification</h2>
+                <button class="modal-close" id="notification-modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="notification-form">
+                    <input type="hidden" id="notification-id">
+
+                    <div class="form-group">
+                        <label for="notification-title">Title *</label>
+                        <input type="text" id="notification-title" required placeholder="Short headline">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="notification-message">Message *</label>
+                        <textarea id="notification-message" rows="4" required placeholder="Full notification details"></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="notification-priority">Priority / Type</label>
+                            <select id="notification-priority" required>
+                                <option value="5">5 - Critical/Urgent (red - cancellations, emergencies)</option>
+                                <option value="4">4 - Important (orange - RSVP deadlines, time-sensitive)</option>
+                                <option value="3" selected>3 - Normal (blue - announcements, updates)</option>
+                                <option value="2">2 - Minor (blue - FYI, reminders)</option>
+                                <option value="1">1 - Low (green - tips, good news)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="notification-audience">Target Audience</label>
+                            <select id="notification-audience" required>
+                                <option value="all">All Users</option>
+                                <option value="members">Members Only</option>
+                                <option value="admins">Admins Only</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+
+                        <div class="form-group">
+                            <label for="notification-expires">Expires On (optional)</label>
+                            <input type="date" id="notification-expires">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="notification-active" checked>
+                            <span>Active (show to users immediately)</span>
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="notification-modal-cancel" class="btn btn-secondary">Cancel</button>
+                <button type="submit" id="notification-modal-save" class="btn btn-primary">Save Notification</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deduplicate RSVPs Confirmation Modal -->
+    <div id="deduplicate-rsvps-modal" class="modal-overlay">
+        <div class="modal" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2>Remove Duplicate RSVPs</h2>
+                <button class="modal-close" id="deduplicate-rsvps-modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="deduplicate-rsvps-modal-text"></p>
+                <p class="text-muted mt-1">This cannot be undone. The most recent RSVP for each member+event pair will be kept.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="deduplicate-rsvps-modal-dismiss">Go Back</button>
+                <button type="button" class="btn btn-danger" id="deduplicate-rsvps-modal-confirm">Remove Duplicates</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Past RSVPs Confirmation Modal -->
+    <div id="delete-past-rsvps-modal" class="modal-overlay">
+        <div class="modal" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2>Delete Past Event RSVPs</h2>
+                <button class="modal-close" id="delete-past-rsvps-modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="delete-past-rsvps-modal-text"></p>
+                <p class="text-muted mt-1">This cannot be undone. Attendance counts on the Past Events page will not be affected.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="delete-past-rsvps-modal-dismiss">Go Back</button>
+                <button type="button" class="btn btn-danger" id="delete-past-rsvps-modal-confirm">Delete RSVPs</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p class="text-center text-muted">&copy; 2026 Vintage Menschen Chavurah</p>
+        </div>
+    </footer>
+
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/airtable.js"></script>
+    <script src="js/admin.js"></script>
+    <script src="js/notifications.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/service-worker.js');
+}
+</script>
+</body>
+</html>

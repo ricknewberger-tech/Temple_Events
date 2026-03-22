@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#4a90a4">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Members - Chavurah</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <a href="index.html" class="logo">Chavurah</a>
+            <nav>
+                <a href="index.html">Upcoming Events</a>
+                <a href="past-events.html">Past Events</a>
+                <a href="members.html" class="active">Members</a>
+                <a href="guide.html">Guide</a>
+            </nav>
+        </div>
+    </header>
+    
+    <!-- Notification Banner -->
+    <div id="notification-banner-container"></div>
+
+    <main>
+        <div class="container">
+            <h1 class="page-title">Member Directory</h1>
+            <p class="page-subtitle">Our active club members</p>
+
+            <div class="email-toolbar" id="email-toolbar">
+                <label class="select-all-label">
+                    <input type="checkbox" id="select-all-members"> Select All
+                </label>
+                <button id="btn-email-selected" class="btn btn-primary btn-sm" disabled>Email Selected</button>
+            </div>
+
+            <div id="members-list">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading members...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p class="text-center text-muted">&copy; 2026 Vintage Menschen Chavurah</p>
+        </div>
+    </footer>
+
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/airtable.js"></script>
+    <script src="js/members.js"></script>
+    <script src="js/notifications.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/service-worker.js');
+}
+</script>
+</body>
+</html>

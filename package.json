@@ -1,0 +1,16 @@
+{
+  "name": "vintage-menschen-chavurah",
+  "version": "1.0.0",
+  "description": "Vintage Menschen Chavurah Events & RSVP Application",
+  "scripts": {
+    "dev": "netlify dev",
+    "build": "echo 'No build step required'"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.0",
+    "twilio": "^5.12.0"
+  },
+  "devDependencies": {
+    "netlify-cli": "^17.0.0"
+  }
+}

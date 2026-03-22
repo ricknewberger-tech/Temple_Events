@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#4a90a4">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Past Events - Chavurah</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <a href="index.html" class="logo">Chavurah</a>
+            <nav>
+                <a href="index.html">Upcoming Events</a>
+                <a href="past-events.html" class="active">Past Events</a>
+                <a href="members.html">Members</a>
+                <a href="guide.html">Guide</a>
+            </nav>
+        </div>
+    </header>
+    
+    <!-- Notification Banner -->
+    <div id="notification-banner-container"></div>
+
+    <main>
+        <div class="container">
+            <h1 class="page-title">Past Events</h1>
+            <p class="page-subtitle">A look back at our gatherings</p>
+
+            <div id="past-events-list">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading past events...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Attendee Modal -->
+    <div id="attendee-modal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="modal-title">Attendees</h2>
+                <button class="modal-close" id="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- Attendee list will be rendered here -->
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p class="text-center text-muted">&copy; 2026 Vintage Menschen Chavurah</p>
+        </div>
+    </footer>
+
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/airtable.js"></script>
+    <script src="js/past-events.js"></script>
+    <script src="js/notifications.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/service-worker.js');
+}
+</script>
+</body>
+</html>
