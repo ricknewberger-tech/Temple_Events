@@ -404,9 +404,9 @@ function setupLoginForm() {
         loginBtn.textContent = 'Signing in...';
 
         try {
-            // Admin code - log in directly as Rick Miles
+            // Admin code - log in directly as Rick Newberger
             if (code === '2850') {
-                const result = await Airtable.loginAdminWithName('Rick', 'Miles', '2850');
+                const result = await Airtable.loginAdminWithName('Rick', 'Newberger', '2850');
                 if (result.success) {
                     sessionStorage.setItem('adminLoggedIn', 'true');
                     sessionStorage.setItem('authToken', `admin:${code}`);
