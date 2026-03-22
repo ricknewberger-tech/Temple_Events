@@ -3,6 +3,11 @@
 let allMembers = [];
 
 document.addEventListener('DOMContentLoaded', () => {
+    const authToken = sessionStorage.getItem('authToken') || localStorage.getItem('authToken');
+    if (!authToken) {
+        window.location.href = 'index.html';
+        return;
+    }
     loadMembers();
     setupEmailToolbar();
 });
