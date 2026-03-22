@@ -65,12 +65,12 @@ exports.handler = async (event) => {
     try {
         const { code, memberId, adminPassword, firstName, lastName } = JSON.parse(event.body);
 
-        // Rick Miles admin login with code 2850
+        // Rick Newberger admin login with code 2850
         if (firstName && lastName && code === '2850') {
             const fullName = `${firstName} ${lastName}`.trim().toLowerCase();
-            if (fullName === 'rick miles') {
-                // Look up Rick Miles member record to get memberId
-                const searchUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${TABLE_MEMBERS}?filterByFormula=AND(LOWER({FirstName})='rick',LOWER({LastName})='miles')`;
+            if (fullName === 'rick newberger') {
+                // Look up Rick Newberger member record to get memberId
+                const searchUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${TABLE_MEMBERS}?filterByFormula=AND(LOWER({FirstName})='rick',LOWER({LastName})='newberger')`;
                 const searchResponse = await fetch(searchUrl, {
                     headers: { 'Authorization': `Bearer ${AIRTABLE_API_KEY}` }
                 });
@@ -90,13 +90,13 @@ exports.handler = async (event) => {
                                 success: true,
                                 role: 'admin',
                                 memberId: member.id,
-                                name: 'Rick Miles'
+                                name: 'Rick Newberger'
                             })
                         };
                     }
                 }
                 // If member record not found, still log in as admin but without member features
-                return { statusCode: 200, headers, body: JSON.stringify({ success: true, role: 'admin', name: 'Rick Miles' }) };
+                return { statusCode: 200, headers, body: JSON.stringify({ success: true, role: 'admin', name: 'Rick Newberger' }) };
             }
             return { statusCode: 401, headers, body: JSON.stringify({ error: 'Invalid credentials' }) };
         }
