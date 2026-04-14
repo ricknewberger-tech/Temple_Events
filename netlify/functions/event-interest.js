@@ -42,13 +42,9 @@ exports.handler = async (event) => {
                     return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'eventId and memberId required' }) };
                 }
 
-                // First, get all records and filter client-side (Airtable filterByFormula doesn't work well with linked records)
-                const allRecords = await airtableRequest(`${tableId}`);
-                const matchingRecords = (allRecords.records || []).filter(record => {
-                    const eventIds = record.fields.Event || [];
-                    const memberIds = record.fields.Member || [];
-                    return eventIds.includes(params.eventId) && memberIds.includes(params.memberId);
-                });
+                const formula = `AND(FIND("${params.eventId}",ARRAYJOIN({Event})),FIND("${params.memberId}",ARRAYJOIN({Member})))`;
+                const allRecords = await airtableRequest(`${tableId}?filterByFormula=${encodeURIComponent(formula)}`);
+                const matchingRecords = allRecords.records || [];
 
                 if (matchingRecords.length === 0) {
                     return { statusCode: 404, headers: corsHeaders, body: JSON.stringify({ error: 'Interest record not found' }) };

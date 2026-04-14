@@ -5,12 +5,12 @@ const Airtable = {
     cache: new Map(),
     cacheTimestamps: new Map(),
     cacheDurations: {
-        events: 30000,        // 30 seconds for events list
-        members: 60000,       // 1 minute for members
-        rsvps: 15000,         // 15 seconds for RSVPs
-        comments: 15000,      // 15 seconds for comments
-        interest: 15000,      // 15 seconds for interest
-        default: 30000        // 30 seconds default
+        events: 120000,       // 2 minutes for events list
+        members: 300000,      // 5 minutes for members
+        rsvps: 60000,         // 1 minute for RSVPs
+        comments: 60000,      // 1 minute for comments
+        interest: 60000,      // 1 minute for interest
+        default: 60000        // 1 minute default
     },
 
     // Get cache key from endpoint
@@ -269,13 +269,9 @@ const Airtable = {
     // ========== RSVPs ==========
 
     async getRSVPsByEventId(eventId) {
-        // Get all RSVPs and filter client-side (Airtable filterByFormula doesn't work well with linked records)
-        const data = await this.request(`/api/rsvps`);
-        const allRecords = data.records || [];
-        return allRecords.filter(record => {
-            const eventIds = record.fields.Event || [];
-            return eventIds.includes(eventId);
-        });
+        const filter = encodeURIComponent(`FIND("${eventId}",ARRAYJOIN({Event}))`);
+        const data = await this.request(`/api/rsvps?filter=${filter}`);
+        return data.records || [];
     },
 
     async getAllRSVPs() {
@@ -304,13 +300,9 @@ const Airtable = {
     },
 
     async getYesRSVPs(eventId) {
-        // Get all RSVPs and filter client-side (Airtable filterByFormula doesn't work well with linked records)
-        const data = await this.request(`/api/rsvps`);
-        const allRecords = data.records || [];
-        return allRecords.filter(record => {
-            const eventIds = record.fields.Event || [];
-            return eventIds.includes(eventId) && record.fields.Response === 'Yes';
-        });
+        const filter = encodeURIComponent(`AND(FIND("${eventId}",ARRAYJOIN({Event})),{Response}="Yes")`);
+        const data = await this.request(`/api/rsvps?filter=${filter}`);
+        return data.records || [];
     },
 
     async countEventRSVPs(eventId) {
@@ -319,27 +311,18 @@ const Airtable = {
     },
 
     async getMemberEventRSVP(eventId, memberId) {
-        // Get all RSVPs and filter client-side (Airtable filterByFormula doesn't work well with linked records)
-        const data = await this.request(`/api/rsvps`);
-        const allRecords = data.records || [];
-        const filtered = allRecords.filter(record => {
-            const eventIds = record.fields.Event || [];
-            const memberIds = record.fields.Member || [];
-            return eventIds.includes(eventId) && memberIds.includes(memberId);
-        });
-        return filtered.length > 0 ? filtered[0] : null;
+        const filter = encodeURIComponent(`AND(FIND("${eventId}",ARRAYJOIN({Event})),FIND("${memberId}",ARRAYJOIN({Member})))`);
+        const data = await this.request(`/api/rsvps?filter=${filter}`);
+        const records = data.records || [];
+        return records.length > 0 ? records[0] : null;
     },
 
     // ========== Event Updates ==========
 
     async getEventUpdatesByEventId(eventId) {
-        // Get all event updates and filter client-side (Airtable filterByFormula doesn't work well with linked records)
-        const data = await this.request(`/api/event-updates`);
-        const allRecords = data.records || [];
-        return allRecords.filter(record => {
-            const eventIds = record.fields.Event || [];
-            return eventIds.includes(eventId);
-        });
+        const filter = encodeURIComponent(`FIND("${eventId}",ARRAYJOIN({Event}))`);
+        const data = await this.request(`/api/event-updates?filter=${filter}`);
+        return data.records || [];
     },
 
     async createEventUpdate(updateData) {
@@ -365,13 +348,9 @@ const Airtable = {
     // ========== Event Comments ==========
 
     async getEventCommentsByEventId(eventId) {
-        // Get all event comments and filter client-side (Airtable filterByFormula doesn't work well with linked records)
-        const data = await this.request(`/api/event-comments`);
-        const allRecords = data.records || [];
-        return allRecords.filter(record => {
-            const eventIds = record.fields.Event || [];
-            return eventIds.includes(eventId);
-        });
+        const filter = encodeURIComponent(`FIND("${eventId}",ARRAYJOIN({Event}))`);
+        const data = await this.request(`/api/event-comments?filter=${filter}`);
+        return data.records || [];
     },
 
     async createEventComment(commentData) {
@@ -400,13 +379,9 @@ const Airtable = {
     // ========== Event Interest ==========
 
     async getEventInterestByEventId(eventId) {
-        // Get all interest records and filter client-side
-        const data = await this.request(`/api/event-interest`);
-        const allRecords = data.records || [];
-        return allRecords.filter(record => {
-            const eventIds = record.fields.Event || [];
-            return eventIds.includes(eventId);
-        });
+        const filter = encodeURIComponent(`FIND("${eventId}",ARRAYJOIN({Event}))`);
+        const data = await this.request(`/api/event-interest?filter=${filter}`);
+        return data.records || [];
     },
 
     async createEventInterest(eventId, memberId) {
@@ -434,15 +409,10 @@ const Airtable = {
     },
 
     async getMemberEventInterest(eventId, memberId) {
-        // Get all interest records and filter client-side
-        const data = await this.request(`/api/event-interest`);
-        const allRecords = data.records || [];
-        const filtered = allRecords.filter(record => {
-            const eventIds = record.fields.Event || [];
-            const memberIds = record.fields.Member || [];
-            return eventIds.includes(eventId) && memberIds.includes(memberId);
-        });
-        return filtered.length > 0 ? filtered[0] : null;
+        const filter = encodeURIComponent(`AND(FIND("${eventId}",ARRAYJOIN({Event})),FIND("${memberId}",ARRAYJOIN({Member})))`);
+        const data = await this.request(`/api/event-interest?filter=${filter}`);
+        const records = data.records || [];
+        return records.length > 0 ? records[0] : null;
     },
 
     async getAllEventInterests() {
