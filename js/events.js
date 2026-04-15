@@ -104,13 +104,23 @@ async function loadUpcomingEvents() {
         const eventsWithCounts = events.map(event => {
             const isInterested = event.fields.Status === 'Interested';
             const eventRsvps = rsvpsByEvent.get(event.id) || [];
-            const rsvpCount = isInterested ? 0 : eventRsvps.filter(r => r.fields.Response === 'Yes').length;
+            const yesRsvps = isInterested ? [] : eventRsvps.filter(r => r.fields.Response === 'Yes');
+            const rsvpCount = yesRsvps.length;
             const interestCount = isInterested ? (interestsByEvent.get(event.id) || []).length : 0;
             const commentCount = (commentsByEvent.get(event.id) || []).length;
             const userInterest = isInterested && homeSignedInMemberId ? userInterestByEvent.get(event.id) || null : null;
             const userRSVP = homeSignedInMemberId ? userRSVPByEvent.get(event.id) || null : null;
 
-            return { ...event, rsvpCount, interestCount, commentCount, userInterest, userRSVP };
+            // Build attendee first-name list for card preview (only for authenticated users with member map)
+            const attendeeNames = window.homeMembersMap
+                ? yesRsvps.map(r => {
+                    const memberId = (r.fields.Member || [])[0];
+                    const member = window.homeMembersMap.get(memberId);
+                    return member ? (member.fields.FirstName || '').trim() : null;
+                }).filter(Boolean)
+                : [];
+
+            return { ...event, rsvpCount, interestCount, commentCount, userInterest, userRSVP, attendeeNames };
         });
 
         container.innerHTML = eventsWithCounts.map(event => renderEventCard(event)).join('');
@@ -241,6 +251,7 @@ function renderEventCard(event) {
     const rsvpCount = event.rsvpCount || 0;
     const interestCount = event.interestCount || 0;
     const commentCount = event.commentCount || 0;
+    const attendeeNames = event.attendeeNames || [];
     const isFull = MaxAttendees && rsvpCount >= MaxAttendees;
     const rsvpText = Utils.formatRSVPCount(rsvpCount, MaxAttendees);
     const isUserInterested = event.userInterest !== null;
@@ -306,6 +317,12 @@ function renderEventCard(event) {
                     <a href="event.html?id=${event.id}#attendees" class="btn btn-secondary btn-sm">Attending (${rsvpCount})${isFull ? ' - Full' : ''}</a>
                     <a href="event.html?id=${event.id}" class="btn btn-primary btn-sm">${rsvpStatusText}</a>
                     <a href="discussion.html?id=${event.id}" class="btn btn-secondary btn-sm">Discussion${commentCount > 0 ? ` (${commentCount})` : ''}</a>
+                    ${(() => {
+                        if (attendeeNames.length === 0) return '';
+                        const preview = attendeeNames.slice(0, 5);
+                        const overflow = attendeeNames.length - preview.length;
+                        return `<div class="attendee-preview">${preview.join(', ')}${overflow > 0 ? ` and ${overflow} more` : ''}</div>`;
+                    })()}
                     <div class="calendar-dropdown">
                         <button class="btn btn-secondary btn-sm btn-add-calendar" data-event-id="${event.id}">Add to Calendar</button>
                         <div class="calendar-dropdown-menu" id="cal-menu-${event.id}">
@@ -344,6 +361,9 @@ async function loadHomeMembers() {
             const data = await Airtable.request('/api/members?namesOnly=true');
             homeMembers = data.records || [];
         }
+
+        // Build fast ID → member lookup map for attendee name display on cards
+        window.homeMembersMap = new Map(homeMembers.filter(m => m.id).map(m => [m.id, m]));
 
         // If already signed in, show events
         if (homeSignedInMemberId) {

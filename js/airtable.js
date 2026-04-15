@@ -269,9 +269,9 @@ const Airtable = {
     // ========== RSVPs ==========
 
     async getRSVPsByEventId(eventId) {
-        const filter = encodeURIComponent(`FIND("${eventId}",ARRAYJOIN({Event}))`);
-        const data = await this.request(`/api/rsvps?filter=${filter}`);
-        return data.records || [];
+        const data = await this.request('/api/rsvps');
+        const allRecords = data.records || [];
+        return allRecords.filter(record => (record.fields.Event || []).includes(eventId));
     },
 
     async getAllRSVPs() {
@@ -300,9 +300,11 @@ const Airtable = {
     },
 
     async getYesRSVPs(eventId) {
-        const filter = encodeURIComponent(`AND(FIND("${eventId}",ARRAYJOIN({Event})),{Response}="Yes")`);
-        const data = await this.request(`/api/rsvps?filter=${filter}`);
-        return data.records || [];
+        const data = await this.request('/api/rsvps');
+        const allRecords = data.records || [];
+        return allRecords.filter(record =>
+            (record.fields.Event || []).includes(eventId) && record.fields.Response === 'Yes'
+        );
     },
 
     async countEventRSVPs(eventId) {
@@ -311,10 +313,13 @@ const Airtable = {
     },
 
     async getMemberEventRSVP(eventId, memberId) {
-        const filter = encodeURIComponent(`AND(FIND("${eventId}",ARRAYJOIN({Event})),FIND("${memberId}",ARRAYJOIN({Member})))`);
-        const data = await this.request(`/api/rsvps?filter=${filter}`);
-        const records = data.records || [];
-        return records.length > 0 ? records[0] : null;
+        const data = await this.request('/api/rsvps');
+        const allRecords = data.records || [];
+        const filtered = allRecords.filter(record =>
+            (record.fields.Event || []).includes(eventId) &&
+            (record.fields.Member || []).includes(memberId)
+        );
+        return filtered.length > 0 ? filtered[0] : null;
     },
 
     // ========== Event Updates ==========

@@ -803,6 +803,15 @@ main {
     font-style: italic;
 }
 
+/* Home page attendee name preview on event cards */
+.attendee-preview {
+    font-size: 0.82rem;
+    color: var(--text-light);
+    margin-top: 4px;
+    line-height: 1.4;
+    width: 100%;
+}
+
 /* Discussion Page */
 .discussion-page {
     max-width: 900px;
