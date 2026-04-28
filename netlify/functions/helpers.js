@@ -25,6 +25,11 @@ function getTableId(table) {
     return tables[table];
 }
 
+// In-memory cache for member code lookups to avoid hitting Airtable
+// on every authenticated request (and tripping the 5-req/sec rate limit).
+const memberAuthCache = new Map();
+const MEMBER_AUTH_TTL_MS = 5 * 60 * 1000;
+
 async function verifyAuth(event) {
     const auth = event.headers.authorization || event.headers.Authorization || '';
 
@@ -36,16 +41,26 @@ async function verifyAuth(event) {
     const memberMatch = auth.match(/^Bearer member:([a-zA-Z0-9]{4,6})$/);
     if (memberMatch) {
         const code = memberMatch[1].toLowerCase();
+
+        const cached = memberAuthCache.get(code);
+        if (cached && cached.expiresAt > Date.now()) {
+            return cached.value;
+        }
+
         const tableId = getTableId('members');
         try {
             const data = await airtableRequest(
                 `${tableId}?filterByFormula=LOWER({Code})="${code}"&fields[]=Code`
             );
             if (data.records && data.records.length > 0) {
-                return { role: 'member', memberId: data.records[0].id };
+                const value = { role: 'member', memberId: data.records[0].id };
+                memberAuthCache.set(code, { value, expiresAt: Date.now() + MEMBER_AUTH_TTL_MS });
+                return value;
             }
         } catch (e) {
-            // Fall through to return null
+            // On Airtable failure, fall back to cached value if any (even if expired)
+            // so a transient rate-limit hit doesn't log the user out mid-session.
+            if (cached) return cached.value;
         }
     }
 
