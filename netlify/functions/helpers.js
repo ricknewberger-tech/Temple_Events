@@ -28,7 +28,19 @@ function getTableId(table) {
 // In-memory cache for member code lookups to avoid hitting Airtable
 // on every authenticated request (and tripping the 5-req/sec rate limit).
 const memberAuthCache = new Map();
+const inFlightLookups = new Map();
 const MEMBER_AUTH_TTL_MS = 5 * 60 * 1000;
+
+async function lookupMemberCode(code) {
+    const tableId = getTableId('members');
+    const data = await airtableRequest(
+        `${tableId}?filterByFormula=LOWER({Code})="${code}"&fields[]=Code`
+    );
+    if (data.records && data.records.length > 0) {
+        return { role: 'member', memberId: data.records[0].id };
+    }
+    return null;
+}
 
 async function verifyAuth(event) {
     const auth = event.headers.authorization || event.headers.Authorization || '';
@@ -47,19 +59,24 @@ async function verifyAuth(event) {
             return cached.value;
         }
 
-        const tableId = getTableId('members');
+        // Coalesce parallel lookups for the same code so a burst of cold-start
+        // requests only triggers one Airtable call instead of N.
+        let pending = inFlightLookups.get(code);
+        if (!pending) {
+            pending = lookupMemberCode(code).finally(() => inFlightLookups.delete(code));
+            inFlightLookups.set(code, pending);
+        }
+
         try {
-            const data = await airtableRequest(
-                `${tableId}?filterByFormula=LOWER({Code})="${code}"&fields[]=Code`
-            );
-            if (data.records && data.records.length > 0) {
-                const value = { role: 'member', memberId: data.records[0].id };
+            const value = await pending;
+            if (value) {
                 memberAuthCache.set(code, { value, expiresAt: Date.now() + MEMBER_AUTH_TTL_MS });
                 return value;
             }
         } catch (e) {
             // On Airtable failure, fall back to cached value if any (even if expired)
             // so a transient rate-limit hit doesn't log the user out mid-session.
+            console.error('verifyAuth Airtable lookup failed:', e.message);
             if (cached) return cached.value;
         }
     }
