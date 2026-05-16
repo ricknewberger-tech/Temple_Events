@@ -141,7 +141,7 @@ async function renderEventDetail(event, rsvps, updates, comments) {
     }
 
     return `
-        <a href="index.html" class="btn btn-secondary btn-sm mb-3">&larr; Back to Events</a>
+        <a href="index.html#event-${event.id}" class="btn btn-secondary btn-sm mb-3">&larr; Back to Events</a>
 
         <div class="event-detail">
             <div class="event-detail-main">

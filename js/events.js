@@ -125,6 +125,13 @@ async function loadUpcomingEvents() {
 
         container.innerHTML = eventsWithCounts.map(event => renderEventCard(event)).join('');
 
+        if (window.location.hash) {
+            const target = document.querySelector(window.location.hash);
+            if (target) {
+                setTimeout(() => target.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+            }
+        }
+
         // Attach interest checkbox listeners
         document.querySelectorAll('.interest-checkbox').forEach(checkbox => {
             checkbox.addEventListener('change', async (e) => {
@@ -280,7 +287,7 @@ function renderEventCard(event) {
     const dateTimeLabel = isInterested ? 'Proposed:' : '';
 
     return `
-        <div class="card event-card ${isInterested ? 'event-card-interested' : ''}">
+        <div id="event-${event.id}" class="card event-card ${isInterested ? 'event-card-interested' : ''}">
             <div class="event-date-box ${isInterested ? 'event-date-box-interested' : ''}">
                 <div class="month">${month}</div>
                 <div class="day">${day}</div>
