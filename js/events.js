@@ -240,7 +240,7 @@ async function loadUpcomingEvents() {
 }
 
 function renderEventCard(event) {
-    const { EventName, EventDate, EventTime, LocationType, CustomLocation, Address, MaxAttendees, Description, Status, CancelReason, MemberHost } = event.fields;
+    const { EventName, EventDate, EventTime, LocationType, CustomLocation, Address, MaxAttendees, Description, Status, CancelReason, MemberHost, IsExternal } = event.fields;
     const isCancelled = Status === 'Canceled';
     const isInterested = Status === 'Interested';
     const date = new Date(EventDate + 'T00:00:00');
@@ -287,8 +287,8 @@ function renderEventCard(event) {
     const dateTimeLabel = isInterested ? 'Proposed:' : '';
 
     return `
-        <div id="event-${event.id}" class="card event-card ${isInterested ? 'event-card-interested' : ''}">
-            <div class="event-date-box ${isInterested ? 'event-date-box-interested' : ''}">
+        <div id="event-${event.id}" class="card event-card ${isInterested ? 'event-card-interested' : ''} ${IsExternal ? 'event-card-external' : ''}">
+            <div class="event-date-box ${isInterested ? 'event-date-box-interested' : ''} ${IsExternal ? 'event-date-box-external' : ''}">
                 <div class="month">${month}</div>
                 <div class="day">${day}</div>
                 <div class="dow">${dayOfWeek}</div>
@@ -298,6 +298,7 @@ function renderEventCard(event) {
                     ${isCancelled ? (EventName || 'Untitled Event') + ' <span class="badge badge-cancelled">Canceled</span>' :
                       isInterested ? `<a href="event.html?id=${event.id}">${EventName || 'Untitled Event'}</a> <span class="badge badge-interested">INTERESTED</span>` :
                       `<a href="event.html?id=${event.id}">${EventName || 'Untitled Event'}</a>`}
+                    ${IsExternal ? ' <span class="badge badge-external">External</span>' : ''}
                 </h3>
                 <div class="event-meta">
                     ${dateTimeLabel ? `<span class="text-muted">${dateTimeLabel}</span>` : ''}

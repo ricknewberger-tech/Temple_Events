@@ -851,6 +851,7 @@ function openEditEventModal(eventId) {
     document.getElementById('event-max').value = event.fields.MaxAttendees || '';
     document.getElementById('event-status').value = event.fields.Status || 'Upcoming';
     document.getElementById('event-description').value = event.fields.Description || '';
+    document.getElementById('event-is-external').checked = event.fields.IsExternal || false;
     document.getElementById('event-modal-save').textContent = 'Save Changes';
 
     // Show Cancel Event button (only for existing events that aren't already canceled)
@@ -900,7 +901,8 @@ async function handleEventSubmit(e) {
             Address: document.getElementById('event-address').value || null,
             MaxAttendees: document.getElementById('event-max').value ? parseInt(document.getElementById('event-max').value) : null,
             Status: document.getElementById('event-status').value || null,
-            Description: document.getElementById('event-description').value || null
+            Description: document.getElementById('event-description').value || null,
+            IsExternal: document.getElementById('event-is-external').checked || false
         };
         const memberHostId = document.getElementById('event-member-host')?.value;
         if (memberHostId) {
